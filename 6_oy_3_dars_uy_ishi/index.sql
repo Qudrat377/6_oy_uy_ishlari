@@ -79,7 +79,7 @@ create table students(
 
 select * from students;
 
-insert into students(name) values('qudrat'), ('sarvar'), ('bobur'), ('sherzod'), ('jalol');
+insert into students(name) values('qudrat'), ('jalol'), ('sarvar'), ('bobur'), ('sherzod'), ('jalol');
 
 drop table if exists courses;
 create table courses(
@@ -121,5 +121,68 @@ JOIN courses c ON e.course_id = c.id;
 select students.name as student, courses.title as course
 from students
 full join enroliments on students.id = enroliments.student_id
-full join courses on enroliments.course_id = courses.id;
+full join courses on enroliments.course_id = courses.id
 where students.id is null or courses.id is null;
+
+-- qo'shimchalar
+
+-- qaysi qursda nechta talaba borligi
+
+select courses.title as kurs_nomi, count(enroliments.student_id) as talabalr_soni
+from courses
+left join enroliments on courses.id = enroliments.course_id
+group by courses.title;
+
+-- eng ko'p kursga yozilgan talabalar
+
+select students.name as talaba_ismi, count(enroliments.course_id) as kurslar_soni
+from students
+join enroliments on students.id = enroliments.student_id
+group by students.name
+order by kurslar_soni desc;
+
+-- birorta kursga yozilmagan talaba 
+
+select students.name as talaba, courses.title as kurs
+from students
+left join enroliments on students.id = enroliments.student_id
+left join courses on enroliments.course_id = courses.id;
+
+-- talaba o'qimayotgan kursni korish
+
+select students.name as talaba, courses.title as kurs
+from enroliments
+right join courses on enroliments.course_id = courses.id
+left join students on enroliments.student_id = students.id;
+
+-- cross join 
+
+select students.name, courses.title
+from students
+cross join courses;
+
+-- self join 
+
+select a.name, b.id
+from students a, students b
+where a.id <> b.id and a.name = b.name;
+
+-- having vs where 
+
+select students.name as talaba_ismi, count(enroliments.course_id) as kurslar_soni
+from students
+join enroliments on students.id = enroliments.student_id
+group by students.name
+having count(enroliments.course_id) > 1;
+
+-- 
+
+select students.name as talaba_ismi,
+count(enroliments.course_id) as kurslar_soni,
+string_agg(courses.title, ', ') as kurslar_royxati
+from students
+join enroliments on students.id = enroliments.student_id
+join courses on enroliments.course_id = courses.id
+group by students.name
+having count(enroliments.course_id) > 1
+order by kurslar_soni desc;
