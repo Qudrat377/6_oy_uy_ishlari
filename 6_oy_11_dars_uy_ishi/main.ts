@@ -1,0 +1,41 @@
+import express from "express"
+import cors from "cors"
+import dotenv from "dotenv"
+import authRouter from "./router/auth.routes.js"
+import { errorMiddleware } from "./middleware/error.middleware.js"
+import cookieParser from "cookie-parser"
+import superadminRouter from "./router/superadmin.routes.js"
+import categoryRouter from "./router/category.routes.js"
+import prouctRouter from "./router/product.routes.js"
+import savedRouter from "./router/saved.routes.js"
+import karzinaRouter from "./router/karzina.routes.js"
+import orderRouter from "./router/order.routes.js"
+import userRouter from "./router/user.routes.js"
+
+const app = express()
+dotenv.config()
+app.use(cors())
+app.use(express.json())
+app.use(cookieParser())
+
+const PORT = process.env.PORT || 3000
+
+// upload 
+
+app.use("/images", express.static("upload/images"))
+
+// router 
+app.use(authRouter)
+app.use(superadminRouter)
+app.use(categoryRouter)
+app.use(prouctRouter)
+app.use(savedRouter)
+app.use(karzinaRouter)
+app.use(orderRouter)
+app.use(userRouter)
+
+app.use(errorMiddleware)
+
+app.listen(PORT, () => {
+    console.log(`Server is running at: ${PORT}`);
+})
